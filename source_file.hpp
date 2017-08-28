@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <list>
 #include <tuple>
 
 class Line : public std::string {
@@ -27,7 +28,7 @@ public:
     }
 };
 
-class SourceFile : public std::vector<Line> {
+class SourceFile : public std::list<Line> {
 public:
     void ReadFromFile(std::string_view filename);
     void WriteToFile(std::string_view filename);
