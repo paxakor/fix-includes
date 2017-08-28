@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <tuple>
+#include <unordered_set>
 #include <vector>
 
 class Fixer {
@@ -48,7 +49,20 @@ private:
         }
     }
 
-    static void FixIncludesInRange(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end) {
+    static auto RemoveRepeatedLines(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end,
+                                    std::unordered_set<std::string>& inserted) {
+        while (begin != end && inserted.count(*begin))
+            begin = file.erase(begin);
+        for (auto iter = begin; iter != end;)
+            if (inserted.count(*iter))
+                iter = file.erase(iter);
+            else
+                inserted.insert(*iter++);
+        return std::tuple(begin, end);
+    }
+
+    static void FixIncludesInRange(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end,
+                                   std::unordered_set<std::string>& inserted) {
         RemoveEmptyLinesInRange(file, begin, end);
         std::list<Line> to_sort;
         to_sort.splice(to_sort.end(), file, begin, end);
@@ -59,7 +73,7 @@ private:
         });
         begin = to_sort.begin();
         file.splice(end, to_sort, to_sort.begin(), to_sort.end());
-        file.erase(std::unique(begin, end), end);
+        std::tie(begin, end) = RemoveRepeatedLines(file, begin, end, inserted);
         AddEmptyLinesToRange(file, begin, end);
     }
 
@@ -70,11 +84,10 @@ public:
                 line.Type = GetIncludeCategory(line);
 
         const auto ranges = FindRanges(file);
+        std::unordered_set<std::string> inserted;
         for (const auto[begin, end] : ranges)
-            FixIncludesInRange(file, begin, end);
+            FixIncludesInRange(file, begin, end, inserted);
     }
 };
 
-void FixIncludes(SourceFile& file) {
-    Fixer::FixIncludes(file);
-}
+void FixIncludes(SourceFile& file) { Fixer::FixIncludes(file); }
