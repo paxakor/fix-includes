@@ -46,17 +46,19 @@ private:
                 file.emplace(begin);
             }
         }
-        if (end != file.end())
-            file.emplace(end);
     }
 
     static void FixIncludesInRange(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end) {
         RemoveEmptyLinesInRange(file, begin, end);
-        std::sort(begin, end, [](const auto& a, const auto& b) {
+        std::list<Line> to_sort;
+        to_sort.splice(to_sort.end(), file, begin, end);
+        to_sort.sort([](const auto& a, const auto& b) {
             if (a.Type != b.Type)
                 return static_cast<int>(a.Type) < static_cast<int>(b.Type);
             return dynamic_cast<const std::string&>(a) < dynamic_cast<const std::string&>(b);
         });
+        begin = to_sort.begin();
+        file.splice(end, to_sort, to_sort.begin(), to_sort.end());
         file.erase(std::unique(begin, end), end);
         AddEmptyLinesToRange(file, begin, end);
     }
