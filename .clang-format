@@ -1,0 +1,13 @@
+AccessModifierOffset: -4
+AllowShortFunctionsOnASingleLine: true
+ColumnLimit: 120
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+BreakConstructorInitializersBeforeComma: true
+IndentWidth: 4
+Language: Cpp
+NamespaceIndentation: All
+PointerBindsToType: true
+SpacesBeforeTrailingComments: 2
+Standard: Auto
+TabWidth: 4
+UseTab: Never
