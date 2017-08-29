@@ -1,5 +1,5 @@
 AccessModifierOffset: -4
-AllowShortFunctionsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
 ColumnLimit: 120
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 BreakConstructorInitializersBeforeComma: true
