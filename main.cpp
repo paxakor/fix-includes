@@ -19,8 +19,10 @@ static void FixIncludesInFile(std::string_view filename) {
 
 static void PrintUsage(std::string_view bin) {
     std::cout << "Usage:\n"
-              << '\t' << bin << " -i [FILE]...    Inplace edit [FILE]s\n"
-              << '\t' << bin << " [SRC] [DST]     Write fixed [SRC] to [DST]\n";
+              << '\t' << bin << "[options]... -i [FILE]...    Inplace edit [FILE]s\n"
+              << '\t' << bin << "[options]... [SRC] [DST]     Write fixed [SRC] to [DST]\n"
+              << "Options:\n"
+              << "\t-I[path] - search headers in [path]\n";
 }
 
 int main(int argc, const char** argv) {

@@ -2,26 +2,33 @@
 
 #pragma once
 
+#include <list>
 #include <string>
 #include <string_view>
-#include <vector>
-#include <list>
 #include <tuple>
 
 class Line : public std::string {
-private:
-    inline static const/*expr*/ std::string_view Directive = "#include";
-
 public:
-    enum IncludeCategory { LOCAL, GLOBAL, EXPCPP, STDCPP, STDC, POSIX, DEPRECATED, UNKNOWN };
+    enum IncludeCategory {
+        PAIRED_HEADER,
+        LOCAL,
+        SAME_PROJ,
+        /* pre-global specific indexes */
+        GLOBAL = 1000,
+        /* pre-std specific indexes */
+        EXPCPP = 2000,
+        STDCPP,
+        STDC,
+        POSIX,
+        DEPRECATED,
+        UNKNOWN
+    };
     IncludeCategory Type = UNKNOWN;
 
 public:
     std::tuple<std::string_view, bool> IncludePath() const;  // returns [path, isGlobal]
 
-    bool IsInclude() const {
-        return std::string_view(*this).substr(0, Directive.size()) == Directive;
-    }
+    bool IsInclude() const;
 
     bool IsEmpty() const {
         return empty();

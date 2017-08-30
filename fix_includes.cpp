@@ -18,13 +18,13 @@ private:
             if (iter == file.end())
                 break;
             const auto begin = iter++;
-            auto lats_include = begin;
+            auto lastInclude = begin;
             while (iter != file.end() && (iter->IsInclude() || iter->IsEmpty()))
                 if (iter->IsInclude())
-                    lats_include = iter++;
+                    lastInclude = iter++;
                 else
                     ++iter;
-            ranges.emplace_back(begin, ++lats_include);
+            ranges.emplace_back(begin, ++lastInclude);
         }
         return ranges;
     }
@@ -69,7 +69,7 @@ private:
         to_sort.sort([](const auto& a, const auto& b) {
             if (a.Type != b.Type)
                 return static_cast<int>(a.Type) < static_cast<int>(b.Type);
-            return dynamic_cast<const std::string&>(a) < dynamic_cast<const std::string&>(b);
+            return static_cast<const std::string&>(a) < static_cast<const std::string&>(b);
         });
         begin = to_sort.begin();
         file.splice(end, to_sort, to_sort.begin(), to_sort.end());
@@ -90,4 +90,6 @@ public:
     }
 };
 
-void FixIncludes(SourceFile& file) { Fixer::FixIncludes(file); }
+void FixIncludes(SourceFile& file) {
+    Fixer::FixIncludes(file);
+}
