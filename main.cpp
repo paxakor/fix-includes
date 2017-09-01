@@ -7,10 +7,10 @@
 #include <string_view>
 
 static void FixIncludesInFile(std::string_view src, std::string_view dst) {
-    SourceFile sf;
-    sf.ReadFromFile(src);
+    SourceFile sf(src, dst);
+    sf.ReadFromFile();
     FixIncludes(sf);
-    sf.WriteToFile(dst);
+    sf.WriteToFile();
 }
 
 static void FixIncludesInFile(std::string_view filename) {

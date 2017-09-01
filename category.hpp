@@ -4,4 +4,4 @@
 
 #include "source_file.hpp"
 
-Line::IncludeCategory GetIncludeCategory(const Line& line);
+Line::IncludeCategory GetIncludeCategory(const Line& line, const SourceFile& file);

@@ -13,6 +13,7 @@ static std::string_view TryParseInclude(std::string_view sv) {
             return false;
         sv.remove_prefix(prefix.size());
         sv = Strip(sv);
+        return true;
     };
     sv = Strip(sv);
     return removePrefix("#") && removePrefix("include") ? sv : "";
@@ -33,16 +34,16 @@ bool Line::IsInclude() const {
     return !TryParseInclude(*this).empty();
 }
 
-void SourceFile::ReadFromFile(std::string_view filename) {
+void SourceFile::ReadFromFile() {
     clear();
-    std::ifstream fin(filename.data());
+    std::ifstream fin(src.data());
     while (fin.good()) {
         emplace_back();
         std::getline(fin, back());
     }
 }
 
-void SourceFile::WriteToFile(std::string_view filename) {
-    std::ofstream fout(filename.data());
+void SourceFile::WriteToFile() {
+    std::ofstream fout(dst.data());
     JoinToStream(fout, begin(), end(), '\n');
 }

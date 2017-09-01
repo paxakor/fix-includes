@@ -37,6 +37,9 @@ public:
 
 class SourceFile : public std::list<Line> {
 public:
-    void ReadFromFile(std::string_view filename);
-    void WriteToFile(std::string_view filename);
+    std::string_view src;
+    std::string_view dst;
+    SourceFile(std::string_view src, std::string_view dst) : src(src), dst(dst) {};
+    void ReadFromFile();
+    void WriteToFile();
 };

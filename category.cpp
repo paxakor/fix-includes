@@ -96,7 +96,7 @@ private:
         return global ? Line::GLOBAL : Line::LOCAL;
     }
 
-    static auto GetIncludeCategoryForCpp(std::string_view path, bool global) {
+    static auto GetIncludeCategoryForCpp(std::string_view path, bool global, const SourceFile& file) {
         if (StdCppHeaders.count(path))
             return Line::STDCPP;
         if (ExperimentalCppHeaders.count(path))
@@ -106,29 +106,31 @@ private:
         if (PosixHeaders.count(path))
             return Line::POSIX;
         if (UnsupportedCHeaders.count(path)) {
-            std::cout << "Achtung! Header <" << path << "> is unsupported by C++\n";
+            std::cout << "Achtung! While moving from " << file.src << " to " 
+                      << file.dst << " Found header <" << path << "> that is unsupported by C++\n";
             return Line::STDC;
         }
         if (DeprecatedCHeaders.count(path)) {
-            std::cout << "Achtung! Header <" << path << "> is deprecated in C++\n";
+            std::cout << "Achtung! While moving from " << file.src << " to " 
+                      << file.dst << " Found header <" << path << "> that is deprecated in C++\n";
             return Line::STDC;
         }
         return global ? Line::GLOBAL : Line::LOCAL;
     }
 
 public:
-    static auto GetIncludeCategory(const Line& line) {
+    static auto GetIncludeCategory(const Line& line, const SourceFile& file) {
         const auto[path, global] = line.IncludePath();
         switch (Mode) {
             case C:
                 return GetIncludeCategoryForC(path, global);
             case CPP:
-                return GetIncludeCategoryForCpp(path, global);
+                return GetIncludeCategoryForCpp(path, global, file);
         }
         throw std::runtime_error("Not implemented");
     }
 };
 
-Line::IncludeCategory GetIncludeCategory(const Line& line) {
-    return IncludeCategorySearcher::GetIncludeCategory(line);
+Line::IncludeCategory GetIncludeCategory(const Line& line, const SourceFile& file) {
+    return IncludeCategorySearcher::GetIncludeCategory(line, file);
 }
