@@ -17,6 +17,7 @@
 #include <string_view>
 #include <tuple>
 #include <vector>
+
 namespace fs = std::experimental::filesystem;
 
 static std::string FindConfig() {

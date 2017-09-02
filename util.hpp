@@ -3,8 +3,8 @@
 #pragma once
 
 #include <fstream>
-#include <string_view>
 #include <optional>
+#include <string_view>
 
 std::string_view Strip(std::string_view s);
 std::string_view StripLeft(std::string_view s);
