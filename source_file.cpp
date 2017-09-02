@@ -27,7 +27,7 @@ static auto GetLangByExtention(std::string_view filename) {
     const static std::unordered_set<std::string_view> CppExt = {"cpp", "cc", "cxx", "hpp", "hh", "hxx"};
     const auto dotPos = filename.rfind('.');
     if (dotPos != std::string_view::npos) {
-        return CppExt.count(filename.substr(dotPos)) ? CPP : C;
+        return CppExt.count(filename.substr(dotPos + 1)) ? CPP : C;
     }
     return CPP;
 }

@@ -48,14 +48,14 @@ static auto ReadConfig() {
                     mode = C;
                 else if (line == "C++")
                     mode = CPP;
-                else if (line == "AUTO")
+                else if (line == "Auto")
                     mode = AUTO;
                 else
-                    std::cerr << "Parse error in config (line " << number << "): " << string << '\n';
-            } else {
+                    std::cerr << "Error in config (line " << number << "): " << string << '\n';
+            } else if (!line.empty()) {
                 const auto delimPos = line.find(' ');
                 if (delimPos == std::string_view::npos) {
-                    std::cerr << "Parse error in config (line " << number << "): " << string << '\n';
+                    std::cerr << "Error in config (line " << number << "): " << string << '\n';
                     continue;
                 }
                 const auto delim = line.data() + delimPos;
@@ -64,7 +64,7 @@ static auto ReadConfig() {
 #if __has_include(<charconv>)
                 const auto[std::ignore, ec] = std::from_chars(line.data(), delim, cat);
                 if (ec == std::errc::invalid_argument || ec == std::errc::result_out_of_range) {
-                    std::cerr << "Parse error in config (line " << number << "): " << string << '\n';
+                    std::cerr << "Error in config (line " << number << "): " << string << '\n';
                     continue;
                 }
 #else
