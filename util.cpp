@@ -1,4 +1,4 @@
-// Copyright 2017, Pavel Korozevtsev.
+// Copyright 2017, Pavel Korozevtsev, Kutenin Danila.
 
 #include "util.hpp"
 

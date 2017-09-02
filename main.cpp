@@ -1,4 +1,4 @@
-// Copyright 2017, Pavel Korozevtsev.
+// Copyright 2017, Pavel Korozevtsev, Kutenin Danila.
 
 #include "fix_includes.hpp"
 #include "source_file.hpp"
