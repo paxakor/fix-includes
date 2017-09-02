@@ -40,10 +40,10 @@ private:
     static void AddEmptyLinesToRange(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end) {
         if (begin == end)
             return;
-        auto currType = begin->Type;
+        auto currWeight = begin->Weight;
         for (; begin != end; ++begin) {
-            if (begin->Type != currType) {
-                currType = begin->Type;
+            if (begin->Weight != currWeight) {
+                currWeight = begin->Weight;
                 file.emplace(begin);
             }
         }
@@ -67,8 +67,8 @@ private:
         std::list<Line> to_sort;
         to_sort.splice(to_sort.end(), file, begin, end);
         to_sort.sort([](const auto& a, const auto& b) {
-            if (a.Type != b.Type)
-                return static_cast<int>(a.Type) < static_cast<int>(b.Type);
+            if (a.Weight != b.Weight)
+                return static_cast<int>(a.Weight) < static_cast<int>(b.Weight);
             return static_cast<const std::string&>(a) < static_cast<const std::string&>(b);
         });
         begin = to_sort.begin();
@@ -81,7 +81,7 @@ public:
     static auto FixIncludes(SourceFile& file) {
         for (auto& line : file)
             if (line.IsInclude())
-                line.Type = GetIncludeCategory(line);
+                line.Weight = GetIncludeCategory(line, file.GetLang());
 
         const auto ranges = FindRanges(file);
         std::unordered_set<std::string> inserted;

@@ -11,11 +11,6 @@
 
 class IncludeCategorySearcher {
 private:
-    enum Langs { C, CPP };
-
-    // variable to determine which list of standard headers to use
-    inline static Langs Mode = CPP;
-
     // clang-format off
     /* Headers for C++ mode
     ** see http://en.cppreference.com/w/cpp/header for more info
@@ -90,45 +85,46 @@ private:
 private:
     static auto GetIncludeCategoryForC(std::string_view path, bool global) {
         if (StdCHeaders.count(path))
-            return Line::STDC;
+            return STDC;
         if (PosixHeaders.count(path))
-            return Line::POSIX;
-        return global ? Line::GLOBAL : Line::LOCAL;
+            return POSIX;
+        return global ? GLOBAL : LOCAL;
     }
 
     static auto GetIncludeCategoryForCpp(std::string_view path, bool global) {
         if (StdCppHeaders.count(path))
-            return Line::STDCPP;
+            return STDCPP;
         if (ExperimentalCppHeaders.count(path))
-            return Line::EXPCPP;
+            return EXPCPP;
         if (LegacyCHeaders.count(path))
-            return Line::STDC;
+            return STDC;
         if (PosixHeaders.count(path))
-            return Line::POSIX;
+            return POSIX;
         if (UnsupportedCHeaders.count(path)) {
             std::cout << "Achtung! Header <" << path << "> is unsupported by C++\n";
-            return Line::STDC;
+            return STDC;
         }
         if (DeprecatedCHeaders.count(path)) {
             std::cout << "Achtung! Header <" << path << "> is deprecated in C++\n";
-            return Line::STDC;
+            return STDC;
         }
-        return global ? Line::GLOBAL : Line::LOCAL;
+        return global ? GLOBAL : LOCAL;
     }
 
 public:
-    static auto GetIncludeCategory(const Line& line) {
+    static auto GetIncludeCategory(const Line& line, Lang mode) {
         const auto[path, global] = line.IncludePath();
-        switch (Mode) {
-            case C:
-                return GetIncludeCategoryForC(path, global);
-            case CPP:
-                return GetIncludeCategoryForCpp(path, global);
+        switch (mode) {
+        case C:
+            return GetIncludeCategoryForC(path, global);
+        case CPP:
+            return GetIncludeCategoryForCpp(path, global);
+        default:
+            throw std::runtime_error("Not implemented");
         }
-        throw std::runtime_error("Not implemented");
     }
 };
 
-Line::IncludeCategory GetIncludeCategory(const Line& line) {
-    return IncludeCategorySearcher::GetIncludeCategory(line);
+IncludeCategory GetIncludeCategory(const Line& line, Lang mode) {
+    return IncludeCategorySearcher::GetIncludeCategory(line, mode);
 }
