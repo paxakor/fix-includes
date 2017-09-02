@@ -81,7 +81,7 @@ static void FixIncludesInFile(Lang mode, std::string_view src, std::string_view 
     sf.SetLang(mode);
     sf.ReadFromFile(src);
     FixIncludes(sf);
-    sf.WriteToFile(dst);
+    sf.WriteToFile();
 }
 
 static void FixIncludesInFile(Lang mode, std::string_view filename) {

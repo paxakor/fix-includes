@@ -91,7 +91,7 @@ private:
         return global ? GLOBAL : LOCAL;
     }
 
-    static auto GetIncludeCategoryForCpp(std::string_view path, bool global) {
+    static auto GetIncludeCategoryForCpp(std::string_view path, bool global, const SourceFile& file) {
         if (StdCppHeaders.count(path))
             return STDCPP;
         if (ExperimentalCppHeaders.count(path))
@@ -115,12 +115,12 @@ public:
     static auto GetIncludeCategory(const Line& line, Lang mode) {
         const auto[path, global] = line.IncludePath();
         switch (mode) {
-        case C:
-            return GetIncludeCategoryForC(path, global);
-        case CPP:
-            return GetIncludeCategoryForCpp(path, global);
-        default:
-            throw std::runtime_error("Not implemented");
+            case C:
+                return GetIncludeCategoryForC(path, global);
+            case CPP:
+                return GetIncludeCategoryForCpp(path, global);
+            default:
+                throw std::runtime_error("Not implemented");
         }
     }
 };
