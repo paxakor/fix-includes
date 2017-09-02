@@ -109,8 +109,8 @@ private:
                 return static_cast<int>(a.Weight) < static_cast<int>(b.Weight);
             return static_cast<const std::string&>(a) < static_cast<const std::string&>(b);
         });
-        begin = tosort.begin();
-        file.splice(end, tosort, tosort.begin(), tosort.end());
+        begin = toSort.begin();
+        file.splice(end, toSort, toSort.begin(), toSort.end());
         std::tie(begin, end) = RemoveRepeatedLines(file, begin, end, inserted);
         AddEmptyLinesToRange(file, begin, end);
     }

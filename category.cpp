@@ -91,7 +91,7 @@ private:
         return global ? GLOBAL : LOCAL;
     }
 
-    static auto GetIncludeCategoryForCpp(std::string_view path, bool global, const SourceFile& file) {
+    static auto GetIncludeCategoryForCpp(std::string_view path, bool global) {
         if (StdCppHeaders.count(path))
             return STDCPP;
         if (ExperimentalCppHeaders.count(path))
