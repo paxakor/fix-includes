@@ -31,7 +31,7 @@ static std::string FindConfig() {
 }
 
 static auto ReadConfig() {
-    std::vector<std::tuple<std::string, IncludeCategory>> additionalCategories;
+    std::vector<std::tuple<std::string, WeightType>> additionalCategories;
     Lang mode = AUTO;
     const auto cfgPath = FindConfig();
     if (!cfgPath.empty()) {
@@ -58,7 +58,7 @@ static auto ReadConfig() {
                     continue;
                 }
                 const auto delim = line.data() + delimPos;
-                IncludeCategory cat;
+                WeightType cat;
 // TODO (@paxakor): clean up here when someone implement <charconv>
 #if __has_include(<charconv>)
                 const auto[std::ignore, ec] = std::from_chars(line.data(), delim, cat);
@@ -67,7 +67,7 @@ static auto ReadConfig() {
                     continue;
                 }
 #else
-                cat = static_cast<IncludeCategory>(std::atoi(line.data()));
+                cat = static_cast<WeightType>(std::atoi(line.data()));
 #endif
                 additionalCategories.emplace_back(Strip({delim, line.size() - delimPos}), cat);
             }

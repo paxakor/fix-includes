@@ -2,59 +2,42 @@
 
 #include "category.hpp"
 #include "source_file.hpp"
+#include "util.hpp"
 
 #include <algorithm>
+#include <string>
+#include <string_view>
 #include <tuple>
 #include <unordered_set>
 #include <vector>
 
 class Fixer {
 private:
-    static auto FormatInclude(std::string& cur) {
-        // we know that cur has '#\s*include \s* something'
-        static const auto include = static_cast<const std::string&>("include");
-        auto afterInclude = cur.find(include) + include.size();
-        while (std::isspace(cur.back()))
-            cur.pop_back();
+    using LineIterator = SourceFile::iterator;
 
-        cur.erase(std::remove_if(cur.begin(), cur.begin() + afterInclude, [](auto x) {
-            return std::isspace(x);
-        }), cur.begin() + afterInclude);
-        afterInclude = cur.find(include) + include.size();
-        // if we haven't found the space
-        if (!std::isspace(cur[afterInclude])) {
-            cur += " ";
-            auto cursize = cur.size() - 1;
-            while (cursize > afterInclude) {
-                cur[cursize] = cur[cursize - 1];
-                --cursize;
-            }
-            cur[cursize] = ' ';
-        } else {
-            // if we have found it
-            auto endSpaces = afterInclude;
-            while (std::isspace(cur[endSpaces])) {
-                ++endSpaces;
-            }
-            cur.erase(cur.begin() + afterInclude + 1, cur.begin() + endSpaces);
+    static auto FormatInclude(std::string& line) {
+        line = "#include " + std::string(Strip(*ParseDirective(line, "include")));
+    }
+
+    static auto FindBegin(LineIterator begin, LineIterator end) {
+        for (auto nestingLevel = 0; begin != end && (nestingLevel || !begin->IsInclude()); ++begin) {
+            // with current implementation of ParseDirective last 2 calls are useless
+            if (ParseDirective(*begin, "if") /*|| ParseDirective(*begin, "ifdef") || ParseDirective(*begin, "ifndef")*/)
+                ++nestingLevel;
+            if (ParseDirective(*begin, "endif"))
+                --nestingLevel;
         }
+        return begin;
     }
 
     static auto FindRanges(SourceFile& file) {
-        std::vector<std::tuple<SourceFile::iterator, SourceFile::iterator>> ranges;
-        for (auto iter = file.begin(); iter != file.end();) {
-            while (iter != file.end() && !iter->IsInclude())
-                ++iter;
-            if (iter == file.end())
-                break;
-            FormatInclude(*iter);
+        std::vector<std::tuple<LineIterator, LineIterator>> ranges;
+        for (auto iter = FindBegin(file.begin(), file.end()); iter != file.end(); iter = FindBegin(iter, file.end())) {
             const auto begin = iter++;
             auto lastInclude = begin;
-            while (iter != file.end() && (iter->IsInclude() || iter->IsEmpty()))
-                if (iter->IsInclude()) {
-                    FormatInclude(*iter);
+            while (iter != file.end() && (iter->IsEmpty() || iter->IsInclude()))
+                if (iter->IsInclude())
                     lastInclude = iter++;
-                }
                 else
                     ++iter;
             ranges.emplace_back(begin, ++lastInclude);
@@ -62,7 +45,7 @@ private:
         return ranges;
     }
 
-    static void RemoveEmptyLinesInRange(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end) {
+    static void RemoveEmptyLinesInRange(SourceFile& file, LineIterator begin, LineIterator end) {
         while (begin != end)
             if (begin->IsEmpty())
                 begin = file.erase(begin);
@@ -70,7 +53,7 @@ private:
                 ++begin;
     }
 
-    static void AddEmptyLinesToRange(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end) {
+    static void AddEmptyLinesToRange(SourceFile& file, LineIterator begin, LineIterator end) {
         if (begin == end)
             return;
         auto currWeight = begin->Weight;
@@ -81,27 +64,23 @@ private:
             }
         }
         // add empty line before function/commentary if needed
-        if (end != file.end() && !end->IsEmpty()) {
+        if (end != file.end() && !end->IsEmpty())
             file.emplace(end);
-        }
     }
 
-    static auto RemoveRepeatedLines(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end,
+    static auto RemoveRepeatedLines(SourceFile& file, LineIterator begin, LineIterator end,
                                     std::unordered_set<std::string>& inserted) {
         while (begin != end && inserted.count(*begin))
             begin = file.erase(begin);
         for (auto iter = begin; iter != end;)
             if (inserted.count(*iter))
                 iter = file.erase(iter);
-            else {
+            else
                 inserted.insert(*iter++);
-            }
         return std::tuple(begin, end);
     }
 
-    static void FixIncludesInRange(SourceFile& file, SourceFile::iterator begin, SourceFile::iterator end,
-                                   std::unordered_set<std::string>& inserted) {
-        RemoveEmptyLinesInRange(file, begin, end);
+    static auto SortRange(SourceFile& file, LineIterator begin, LineIterator end) {
         std::list<Line> toSort;
         toSort.splice(toSort.end(), file, begin, end);
         toSort.sort([](const auto& a, const auto& b) {
@@ -111,6 +90,19 @@ private:
         });
         begin = toSort.begin();
         file.splice(end, toSort, toSort.begin(), toSort.end());
+        return std::tuple(begin, end);
+    }
+
+    static auto FormatIncludeInRange(LineIterator begin, LineIterator end) {
+        for (; begin != end; ++begin)
+            FormatInclude(*begin);
+    }
+
+    static void FixIncludesInRange(SourceFile& file, LineIterator begin, LineIterator end,
+                                   std::unordered_set<std::string>& inserted) {
+        RemoveEmptyLinesInRange(file, begin, end);
+        FormatIncludeInRange(begin, end);
+        std::tie(begin, end) = SortRange(file, begin, end);
         std::tie(begin, end) = RemoveRepeatedLines(file, begin, end, inserted);
         AddEmptyLinesToRange(file, begin, end);
     }
