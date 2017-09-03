@@ -2,6 +2,11 @@
 
 #pragma once
 
-class SourceFile;
+#include "source_file.hpp"
+
+#include <tuple>
+#include <string>
+
+using CaterogySpec = std::tuple<std::string, WeightType>;
 
 void FixIncludes(SourceFile& file);

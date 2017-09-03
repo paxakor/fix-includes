@@ -4,6 +4,14 @@
 
 #include <cctype>
 
+// TODO (@paxakor): clean up here when someone implement <charconv>
+#if __has_include(<charconv>)
+#include <charconv>
+#else
+#include <cstdlib>
+#include <cerrno>
+#endif
+
 std::string_view Strip(std::string_view s) {
     return StripRight(StripLeft(s));
 }
@@ -34,4 +42,20 @@ std::optional<std::string_view> ParseDirective(std::string_view line, std::strin
         return line;
     else
         return {};
+}
+
+std::tuple<size_t, bool> IntFromString(std::string_view s, int& val) {
+// TODO (@paxakor): clean up here when someone implement <charconv>
+#if __has_include(<charconv>)
+    const auto[end, ec] = std::from_chars(s.data(), s.data() + s.size(), val);
+    return {end - s.data(), ec != std::errc::invalid_argument && ec != std::errc::result_out_of_range};
+#else
+    auto end = s.data() + s.size();
+    auto vall = std::strtol(s.data(), const_cast<char**>(&end), 10);
+    if (errno != ERANGE && s.data() != end) {
+        val = vall;
+        return {end - s.data(), true};
+    }
+    return {end - s.data(), false};
+#endif
 }
