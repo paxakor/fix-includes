@@ -7,7 +7,7 @@
 ** BB    BB     II      GG      GG
 ** BB    BB     II      GG        
 ** BB    BB     II      GG        
-** BBBBBB       II      GG        
+** BBBBBBB      II      GG        
 ** BB    BB     II      GG    GGGG
 ** BB    BB     II      GG      GG
 ** BB    BB     II      GG      GG

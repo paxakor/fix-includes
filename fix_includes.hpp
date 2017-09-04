@@ -6,7 +6,9 @@
 
 #include <tuple>
 #include <string>
+#include <vector>
 
 using CaterogySpec = std::tuple<std::string, WeightType>;
+using CaterogySpecs = std::vector<CaterogySpec>;
 
-void FixIncludes(SourceFile& file);
+void FixIncludes(SourceFile& file, const CaterogySpecs& cats, bool format);

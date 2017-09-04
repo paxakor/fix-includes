@@ -3,9 +3,9 @@
 #ifndef THIRD_H
 #define THIRD_H
 
-# include  <ololo>
-#include<does>
-#  include    <not>
+#include <does>
+#include <not>
+#include <ololo>
 #include <wokr>
 
 signed minor ();

@@ -43,7 +43,7 @@ static std::variant<CaterogySpec, Lang, bool> ParseConfigLine(std::string_view l
 }
 
 static auto ReadConfig() {
-    std::vector<CaterogySpec> additionalCategories;
+    CaterogySpecs additionalCategories;
     Lang mode = AUTO;
     const auto cfgPath = FindConfig();
     if (!cfgPath.empty()) {
@@ -74,16 +74,15 @@ static auto ReadConfig() {
     return std::tuple(mode, additionalCategories);
 }
 
-static void FixIncludesInFile(std::vector<CaterogySpec> cats, Lang mode, std::string_view src, std::string_view dst) {
+static void FixIncludesInFile(const CaterogySpecs& cats, Lang mode, std::string_view src, std::string_view dst) {
     SourceFile sf;
     sf.SetLang(mode);
     sf.ReadFromFile(src);
-    FixIncludes(sf);
+    FixIncludes(sf, cats, true);
     sf.WriteToFile(dst);
-    (void)cats;
 }
 
-static void FixIncludesInFile(std::vector<CaterogySpec> cats, Lang mode, std::string_view filename) {
+static void FixIncludesInFile(const CaterogySpecs& cats, Lang mode, std::string_view filename) {
     return FixIncludesInFile(cats, mode, filename, filename);
 }
 

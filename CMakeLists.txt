@@ -13,18 +13,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z -Wall -Wextra -Wpedantic")
 
 # Get the current working branch
 execute_process(
-  COMMAND git rev-parse --abbrev-ref HEAD
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_BRANCH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-if(GIT_BRANCH STREQUAL "master")
+if(GIT_BRANCH STREQUAL "master" AND NOT DEBUG)
     message(STATUS "Release version")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Werror -DNDEBUG")
 else()
     message(STATUS "Developer version")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Og -ggdb -DDEBUG")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -ggdb -DDEBUG")
 endif()
 
 add_executable(fix-includes ${SOURCES})

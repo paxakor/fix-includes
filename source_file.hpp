@@ -31,15 +31,15 @@ public:
     WeightType Weight = UNKNOWN;
 
 public:
-    std::tuple<std::string_view, bool> IncludePath() const;  // returns [path, isGlobal]
+    using std::string::string;
 
     bool IsInclude() const;
-
     bool IsEmpty() const {
         return empty();
     }
-};
 
+    std::tuple<std::string_view, bool> IncludePath() const;  // returns [path, isGlobal]
+};
 
 enum Lang { C, CPP, AUTO };
 
@@ -49,10 +49,13 @@ private:
     Lang Mode = AUTO;
 
 public:
+    using std::list<Line>::list;
+
+    Lang GetLang() const;
     void SetLang(Lang mode) {
         Mode = mode;
     }
-    Lang GetLang() const;
+
     void ReadFromFile(std::string_view filename);
     void WriteToFile(std::string_view filename) const;
 };
