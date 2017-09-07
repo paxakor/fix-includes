@@ -54,23 +54,12 @@ private:
         const auto sequences = FindIncludes(file);
         std::vector<std::tuple<LineIterator, LineIterator>> ranges;
         for (auto& seq : sequences) {
-            const auto lstIncPos = [&]() {
-                auto i = static_cast<int>(seq.size()) - 1;
-                for (; i >= 0; --i)
-                    if (!seq[i]->IsEmpty())
-                        break;
-                return i;
-            }();
-            const auto fstIncPos = [&]() {
-                auto i = 0;
-                for (; i < static_cast<int>(seq.size()); ++i)
-                    if (!seq[i]->IsEmpty())
-                        break;
-                return i;
-            }();
-            if (fstIncPos <= lstIncPos) {
-                auto & [ first, last ] = ranges.emplace_back(seq[fstIncPos], seq[fstIncPos]);
-                for (auto i = fstIncPos + 1; i <= lstIncPos; ++i) {
+            const auto notEmpty = [&](LineIterator linePos) { return !linePos->IsEmpty(); };
+            size_t endInc = seq.size() - std::distance(seq.rbegin(), std::find_if(seq.rbegin(), seq.rend(), notEmpty));
+            size_t begInc = std::distance(seq.begin(), std::find_if(seq.begin(), seq.end(), notEmpty));
+            if (begInc < endInc) {
+                auto & [ first, last ] = ranges.emplace_back(seq[begInc], seq[begInc]);
+                for (auto i = begInc + 1; i < endInc; ++i) {
                     file.splice(first, file, seq[i]);
                     first = seq[i];
                 }
