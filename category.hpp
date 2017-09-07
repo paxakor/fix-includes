@@ -4,4 +4,11 @@
 
 #include "source_file.hpp"
 
-IncludeCategory GetIncludeCategory(const Line& line, Lang mode);
+#include <string>
+#include <tuple>
+#include <vector>
+
+using CaterogySpec = std::tuple<std::string, WeightType>;
+using CaterogySpecs = std::vector<CaterogySpec>;
+
+WeightType GetIncludeCategory(const Line& line, const CaterogySpecs& cats, Lang mode);

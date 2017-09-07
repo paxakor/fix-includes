@@ -139,10 +139,10 @@ private:
     }
 
 public:
-    static auto FixIncludes(SourceFile& file, bool format) {
+    static auto FixIncludes(SourceFile& file, const CaterogySpecs& cats, bool format) {
         for (auto& line : file)
             if (line.IsInclude())
-                line.Weight = GetIncludeCategory(line, file.GetLang());
+                line.Weight = GetIncludeCategory(line, cats, file.GetLang());
 
         RemoveEmptyLinesAfterIncludes(file);
         const auto ranges = MakeRanges(file);
@@ -152,6 +152,5 @@ public:
 };
 
 void FixIncludes(SourceFile& file, const CaterogySpecs& cats, bool format) {
-    Fixer::FixIncludes(file, format);
-    (void)cats;
+    Fixer::FixIncludes(file, cats, format);
 }

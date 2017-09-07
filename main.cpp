@@ -37,7 +37,7 @@ static std::variant<CaterogySpec, Lang, bool> ParseConfigLine(std::string_view l
         WeightType cat = 0;
         const auto[pos, success] = IntFromString(line, cat);
         if (success && pos < line.size())
-            return CaterogySpec{line.substr(pos), cat};
+            return CaterogySpec{Strip(line.substr(pos)), cat};
     }
     return false;
 }

@@ -4,6 +4,7 @@
 #include "source_file.hpp"
 
 #include <iostream>
+#include <regex>
 #include <stdexcept>
 #include <string_view>
 #include <unordered_set>
@@ -111,20 +112,36 @@ private:
         return global ? GLOBAL : LOCAL;
     }
 
-public:
-    static auto GetIncludeCategory(const Line& line, Lang mode) {
-        const auto[path, global] = line.IncludePath();
-        switch (mode) {
-            case C:
-                return GetIncludeCategoryForC(path, global);
-            case CPP:
-                return GetIncludeCategoryForCpp(path, global);
-            default:
-                throw std::runtime_error("Not implemented");
+    static auto TryMatchCategory(std::string_view path, const CaterogySpecs& cats) {
+        for (const auto & [ pattern, weight ] : cats) {
+            std::regex rg(pattern);
+            std::cmatch m;
+            if (std::regex_search(path.begin(), path.end(), m, rg))
+                return std::tuple(weight, true);
         }
+        return std::tuple(0, false);
+    }
+
+    static auto GetDefaultIncludeCategory(std::string_view path, bool global, Lang mode) {
+        switch (mode) {
+        case C:
+            return GetIncludeCategoryForC(path, global);
+        case CPP:
+            return GetIncludeCategoryForCpp(path, global);
+        default:
+            throw std::runtime_error("Not implemented");
+        }
+    }
+
+public:
+    static auto GetIncludeCategory(const Line& line, const CaterogySpecs& cats, Lang mode) {
+        const auto[path, global] = line.IncludePath();
+        if (const auto[weight, success] = TryMatchCategory(path, cats); success)
+            return weight;
+        return static_cast<WeightType>((GetDefaultIncludeCategory(path, global, mode) + 1) * 1000);
     }
 };
 
-IncludeCategory GetIncludeCategory(const Line& line, Lang mode) {
-    return IncludeCategorySearcher::GetIncludeCategory(line, mode);
+WeightType GetIncludeCategory(const Line& line, const CaterogySpecs& cats, Lang mode) {
+    return IncludeCategorySearcher::GetIncludeCategory(line, cats, mode);
 }
