@@ -49,4 +49,6 @@ void SourceFile::ReadFromFile(std::string_view filename) {
 void SourceFile::WriteToFile(std::string_view filename) const {
     std::ofstream fout(filename.data());
     JoinToStream(fout, begin(), end(), '\n');
+    if (!this->back().empty())
+        fout << '\n';
 }
